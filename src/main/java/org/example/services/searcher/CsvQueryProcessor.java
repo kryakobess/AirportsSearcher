@@ -5,7 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.services.filter.Filter;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,9 +17,14 @@ public class CsvQueryProcessor implements FileQueryProcessor {
 
     @Override
     public void preprocessFile(String filePath, String delimiter) throws Exception {
-        var rowNames = saveAllRowNames(filePath, delimiter);
-        for (var rowName : rowNames) {
-            trie.add(rowName.getName(), rowName.getRowByte());
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            int byteCount = 0;
+            while ((line = reader.readLine()) != null) {
+                var row = line.split(delimiter);
+                trie.add(row[1].replaceAll("\"", "").toLowerCase(), byteCount);
+                byteCount += line.getBytes().length + 1;
+            }
         }
     }
 
@@ -39,21 +46,6 @@ public class CsvQueryProcessor implements FileQueryProcessor {
             System.out.println("Cannot open file!");
         }
         return result;
-    }
-
-    private List<RowName> saveAllRowNames(String filePath, String delimiter) throws Exception{
-        List<RowName> rowNames = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            int byteCount = 0;
-            while ((line = reader.readLine()) != null) {
-                var row = line.split(delimiter);
-                rowNames.add(new RowName(row[1].replaceAll("\"", "").toLowerCase(), byteCount));
-                byteCount += line.getBytes().length + 1;
-            }
-        }
-        rowNames.sort(RowName::compareTo);
-        return rowNames;
     }
 
     @Data

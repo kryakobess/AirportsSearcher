@@ -44,9 +44,6 @@ public class Main {
             printSearchResult(res, duration);
             System.gc();
 
-            long afterUsedMem = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024);
-            System.out.println(afterUsedMem);
-
             expression = askForQuery(in, ASK_FOR_NEXT_QUERY);
         }
 
