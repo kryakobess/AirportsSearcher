@@ -3,7 +3,6 @@ package org.example;
 import org.example.services.filter.Filter;
 import org.example.services.filter.FilterImpl;
 import org.example.services.searcher.CsvTSTQueryProcessor;
-import org.example.services.searcher.CsvTrieQueryProcessor;
 import org.example.services.searcher.FileQueryProcessor;
 
 import java.util.List;
@@ -15,7 +14,7 @@ public class Main {
     private static final String FILE_PATH = "src/main/resources/airports.csv";
     private static final String ASK_FOR_NEXT_QUERY =
             "Enter filtering expression (press Enter for no filtering) or '!quit' to finish querying :";
-    private static final FileQueryProcessor processor = new CsvTrieQueryProcessor();
+    private static final FileQueryProcessor processor = new CsvTSTQueryProcessor();
 
 
     public static void main(String[] args) {
@@ -45,8 +44,6 @@ public class Main {
 
             printSearchResult(res, duration);
             System.gc();
-            long afterUsedMem = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory()) / (1024*1024);
-            System.out.println(afterUsedMem);
             expression = askForQuery(in, ASK_FOR_NEXT_QUERY);
         }
 
