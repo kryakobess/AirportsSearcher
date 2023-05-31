@@ -2,7 +2,9 @@ package org.example;
 
 import org.example.services.filter.Filter;
 import org.example.services.filter.FilterImpl;
-import org.example.services.searcher.CsvQueryProcessor;
+import org.example.services.searcher.CsvTSTQueryProcessor;
+import org.example.services.searcher.CsvTrieQueryProcessor;
+import org.example.services.searcher.FileQueryProcessor;
 
 import java.util.List;
 import java.util.Scanner;
@@ -13,7 +15,7 @@ public class Main {
     private static final String FILE_PATH = "src/main/resources/airports.csv";
     private static final String ASK_FOR_NEXT_QUERY =
             "Enter filtering expression (press Enter for no filtering) or '!quit' to finish querying :";
-    private static final CsvQueryProcessor processor = new CsvQueryProcessor();
+    private static final FileQueryProcessor processor = new CsvTrieQueryProcessor();
 
 
     public static void main(String[] args) {

@@ -8,9 +8,9 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CsvQueryProcessor implements FileQueryProcessor {
+public class CsvTrieQueryProcessor implements FileQueryProcessor {
 
-    private final PrefixStorage<Integer> trie = new TernarySearchTree<>();
+    private final PrefixStorage<Integer> trie = new Trie<>();
 
     @Override
     public void preprocessFile(String filePath, String delimiter) throws Exception {
