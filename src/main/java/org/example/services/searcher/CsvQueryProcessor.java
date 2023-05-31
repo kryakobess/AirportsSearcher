@@ -1,8 +1,5 @@
 package org.example.services.searcher;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.example.services.filter.Filter;
 
 import java.io.BufferedReader;
@@ -13,7 +10,7 @@ import java.util.List;
 
 public class CsvQueryProcessor implements FileQueryProcessor {
 
-    private final PrefixStorage<Integer> trie = new Trie<>();
+    private final PrefixStorage<Integer> trie = new TernarySearchTree<>();
 
     @Override
     public void preprocessFile(String filePath, String delimiter) throws Exception {
@@ -47,18 +44,4 @@ public class CsvQueryProcessor implements FileQueryProcessor {
         }
         return result;
     }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    private static class RowName implements Comparable<RowName>{
-        String name;
-        int rowByte;
-
-        @Override
-        public int compareTo(RowName o) {
-            return name.compareTo(o.name);
-        }
-    }
-
 }

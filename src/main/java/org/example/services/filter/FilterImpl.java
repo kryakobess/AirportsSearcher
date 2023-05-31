@@ -55,7 +55,7 @@ public class FilterImpl implements Filter {
 
     private JexlContext mapData(List<String> data) {
         JexlContext context = new MapContext();
-        for (int i = 0; i < data.size(); ++i) {
+        for (short i = 0; i < data.size(); ++i) {
             try {
                 var val = Double.parseDouble(data.get(i));
                 context.set(String.format("column%d", i + 1), val);
