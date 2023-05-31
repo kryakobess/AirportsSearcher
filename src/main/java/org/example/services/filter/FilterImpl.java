@@ -9,18 +9,23 @@ public class FilterImpl implements Filter {
     private static final String COLUMN_QUERY_VALIDATION_FORMAT =
             "\\s*(\\()*column\\[(\\d+)\\]\\s*(=|<>|>|<)\\s*('[^']*'|\"[^\"]*\"|-?\\d*\\.{0,1}\\d+)\\s*(\\))*\\s*";
 
+    private final String expression;
+
+    public FilterImpl(String expression) throws Exception {
+        if (!expression.isBlank() && !isValidExpression(expression)) throw new Exception("Invalid expression format");
+        this.expression = rebuildExpression(expression);
+    }
+
     @Override
-    public boolean filterByExpression(String row, String expression) {
-        if (!isValidExpression(expression)) return false;
+    public boolean filter(String row) {
+        if (expression.isBlank()) return true;
 
         String reformattedRow = row.replaceAll("\"", "");
         List<String> data = List.of(reformattedRow.split(","));
 
         JexlEngine jexl = new JexlBuilder().create();
-        String jexlFormattedExpression = rebuildExpression(expression);
         JexlContext context = mapData(data);
-        JexlExpression filter = jexl.createExpression(jexlFormattedExpression);
-
+        JexlExpression filter = jexl.createExpression(expression);
 
         return (boolean) filter.evaluate(context);
     }

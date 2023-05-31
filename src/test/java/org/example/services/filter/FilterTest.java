@@ -2,59 +2,73 @@ package org.example.services.filter;
 
 import org.apache.commons.jexl3.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class FilterTest {
 
+    static Stream<String> validQueries() {
+        return Stream.of(
+                "(column[1]>10 & (column[10]='GKA')) & column[3] = 15",
+                "column[13] <> -13.413 || column[1] > 45 & (column[5] < 4 & column[12] = 6)",
+                "column[11] = 'UwU'",
+                "column[3144] <>    \"pomp\" & column[3] <4 || column[1]='qqq'",
+                "(((column[314]=-3.14)))",
+                "\n",
+                ""
+        );
+    }
 
-    @Test
-    public void checkValidQuery() {
-        String q = "(column[1]>10 & (column[10]='GKA')) & column[3] = 15";
-        FilterImpl filter = new FilterImpl();
-        assertTrue(filter.isValidExpression(q));
+    static Stream<String> invalidQueries() {
+        return Stream.of(
+                "(colmn[1]>10 & (column[10]='GKA')) & column[3] = 15",
+                "adad  column[13] <> -13.413 || column[1] > 45 & (column[5] < 4 & column[12] = 6)",
+                "column[13] <> -13.413 | column[1] > 45 & (column[5] < 4 & column[12] = 6)",
+                "column[13] <> -13.413 || column[1] > 45 & (column[5] < 4 && column[12] = 6)",
+                "column[13] <  > -13.413 || column[1] > 45 & (column[5] < 4 & column[12] = 6)",
+                "column[11] = 'UwU' kadakmdasl",
+                "column[3144] <> ()    \"pomp\" & column[3] <4 || column[1]='qqq'",
+                "(((column[314] != -3.14)))"
+        );
+    }
+
+
+    @ParameterizedTest
+    @MethodSource("validQueries")
+    public void checkValidQuery(String q) throws Exception {
+        new FilterImpl(q);
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidQueries")
+    public void checkInValidQuery(String q) {
+        try {
+            new FilterImpl(q);
+        } catch (Exception e) {
+            assertTrue(true);
+            return;
+        }
+        fail();
     }
 
     @Test
-    public void checkInValidQuery() {
-        String q = "dada (column[1]>10 & (column[5]='GKA')) & column[3] = 15 adadadadaw";
-        FilterImpl filter = new FilterImpl();
-        assertFalse(filter.isValidExpression(q));
-    }
-
-    @Test
-    public void filter() {
+    public void acceptableFilter() throws Exception {
         String row = "1,\"Goroka Airport\",\"Goroka\",\"Papua New Guinea\",\"GKA\",\"AYGA\",-6.081689834590001,145.391998291,5282,10,\"U\",\"Pacific/Port_Moresby\",\"airport\",\"OurAirports\"\n";
         String expression = "(column[3] = 'Goroka' || column[2] = 'Paris') & column[4] <> 'Rome' & column[7] < -5.6913";
-        Filter filter = new FilterImpl();
-        assertTrue(filter.filterByExpression(row, expression));
+        Filter filter = new FilterImpl(expression);
+        assertTrue(filter.filter(row));
     }
-
 
     @Test
-    public void jexl() {
-        String q = "(column1 == 'gpa' || column2 == 7) && column3 < 19";
-        var data = "gpa, 5, 17, 12QQ".split(", ");
-        JexlContext context = new MapContext();
-        JexlEngine engine = new JexlBuilder().create();
-        JexlExpression expression = engine.createExpression(q);
-        for (int i = 0; i < data.length; ++i) {
-           try {
-               int val = Integer.parseInt(data[i]);
-               context.set("column"+(i+1), val);
-           } catch (Exception e) {
-               context.set("column"+(i+1), data[i]);
-           }
-
-       }
-        Object res = expression.evaluate(context);
-        boolean result = (boolean) res;
-        System.out.println(result);
+    public void notAcceptableFilter() throws Exception {
+        String row = "1,\"Goroka Airport\",\"Goroka\",\"Papua New Guinea\",\"GKA\",\"AYGA\",-6.081689834590001,145.391998291,5282,10,\"U\",\"Pacific/Port_Moresby\",\"airport\",\"OurAirports\"\n";
+        String expression = "(column[3] = 'Goroka' || column[2] = 'Paris') & column[4] <> 'Rome' & column[7] < -8.6913";
+        Filter filter = new FilterImpl(expression);
+        assertFalse(filter.filter(row));
     }
+
 }

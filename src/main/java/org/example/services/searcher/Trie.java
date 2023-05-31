@@ -1,23 +1,21 @@
-package org.example.services.names;
+package org.example.services.searcher;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
-public class Trie<T> {
+public class Trie<T> implements PrefixStorage<T>{
     private final Node<T> root;
 
     public Trie() {
         root = new Node<>(new HashMap<>(), null);
     }
 
+    @Override
     public void add(String line, T rowId) {
         var cur = root;
         var symbols = line.toCharArray();
@@ -31,7 +29,8 @@ public class Trie<T> {
         }
     }
 
-    public List<T> findAllRowsByPrefix(String prefix) {
+    @Override
+    public List<T> findRowsByPrefix(String prefix) {
         var cur = root;
         var symbols = prefix.toCharArray();
         for (var symbol : symbols) {
